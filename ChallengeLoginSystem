@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Predefined username and password
+correct_user="admin"
+correct_pw="12345"
+
+# Account lockout settings
+max_attempts=3 # Maximum allowed failed login attempts
+lockout_duration=60 # Lockout duration in seconds (e.g., 60 seconds)
+
+# Initialize failed attempts count
+failed_attempts=0
+
+# Account lockout state
+account_locked=false
+
+# Function to unlock the account
+unlock_account() {
+    account_locked=false
+    failed_attempts=0
+}
+
+while true; do
+    # Check if the account is locked
+    if [ "$account_locked" = true ]; then
+        echo "Account is temporarily locked. Please wait."
+        sleep $lockout_duration
+        unlock_account
+    fi
+
+    # Prompt the user to enter a username
+    read -p "Enter your username: " entered_username
+
+    # Prompt the user to enter a password (hide input)
+    read -s -p "Enter your password: " entered_password
+    echo
+
+    # Check if entered credentials match predefined
+    if [ "$entered_username" == "$correct_user" ] && [ "$entered_password" == "$correct_pw" ]; then
+        echo "Login successful. Welcome, $entered_username!"
+        unlock_account
+        break
+    else
+        failed_attempts=$((failed_attempts + 1))
+        if [ $failed_attempts -ge $max_attempts ]; then
+            echo "Login failed. Account temporarily locked. Please wait."
+            account_locked=true
+        else
+            echo "Login failed. Please check your username and password."
+        fi
+    fi
+done
