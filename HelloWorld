@@ -1,0 +1,7 @@
+#!/bin/bash
+
+greetings="hello world"
+
+echo $greetings
+
+exit 0
